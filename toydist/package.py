@@ -8,7 +8,8 @@ class PackageDescription:
     def __init__(self, name, version=None, summary=None, url=None,
             author=None, author_email=None, maintainer=None,
             maintainer_email=None, license=None, description=None,
-            platforms=None, packages=None, py_modules=None, extensions=None):
+            platforms=None, packages=None, py_modules=None, extensions=None,
+            dependencies=None):
         # XXX: should we check that we have sequences when required
         # (py_modules, etc...) ?
 
@@ -34,6 +35,11 @@ class PackageDescription:
             self.platforms = []
         else:
             self.platforms = platforms
+
+        if not dependencies:
+            self.dependencies = []
+        else:
+            self.dependencies = dependencies
 
         # Package content
         if not packages:
@@ -66,7 +72,8 @@ class PackageDescription:
             'platforms': self.platforms,
             'py_modules': self.py_modules,
             'ext_modules': self.extensions,
-            'packages': self.packages}
+            'packages': self.packages,
+            'install_requires': self.dependencies}
 
         return d
 
@@ -123,6 +130,11 @@ Package:
 Extension: %s
     sources:
         %s""" % (e.name, "        \n,".join(e.sources)))
+
+    if pkg.dependencies:
+        r.append("""\
+Dependencies:
+    %s""" % "    \n,".join(pkg.dependencies))
 
 
     return "\n".join(r)
