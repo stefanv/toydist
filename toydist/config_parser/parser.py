@@ -12,7 +12,7 @@ from grammar import \
         description_definition, modules_definition, extension_definition, \
         package_definition, modules_definition, version_definition, \
         author_email_definition, maintainer_definition, \
-        maintainer_email_definition
+        maintainer_email_definition, depends_definition
 
 class InvalidFormat(Exception):
     pass
@@ -32,6 +32,8 @@ class AST(object):
         self.description = None
         self.summary = None
         self.version = None
+
+        self.dependencies = []
 
         # Extensions
         self.extensions = []
@@ -56,6 +58,8 @@ class AST(object):
         maintainer_email_definition.setParseAction(self.parse_maintainer_email)
 
         version_definition.setParseAction(self.parse_version)
+
+        depends_definition.setParseAction(self.parse_depends)
 
         package_definition.setParseAction(self.parse_package)
 
@@ -105,6 +109,11 @@ class AST(object):
     def parse_src(self, s, loc, toks):
         pass
 
+    def parse_depends(self, s, loc, toks):
+        deps = toks.asDict()['dependencies']
+        for dep in deps:
+            self.dependencies.append(str(dep))
+
     def parse_package(self, s, loc, toks):
         d = toks.asDict()
         for pkg in d['packages']:
@@ -129,7 +138,8 @@ class AST(object):
             'description': self.description,
             'packages': self.packages,
             'py_modules': self.py_modules,
-            'extensions': self.extensions}
+            'extensions': self.extensions,
+            'dependencies': self.dependencies}
 
         return d
 
@@ -151,6 +161,10 @@ Description:
     There are also basic facilities for discrete fourier transform,
     basic linear algebra and random number generation.
 Summary: array processing for numbers, strings, records, and objects.
+Depends:
+    Jinja,
+    Pygments,
+    docutils
 Package:
     foo.bar,
     foo.bar2,
@@ -176,6 +190,8 @@ Extension: _foo.bar
     print ast.maintainer
     print ast.maintainer_email
     print ast.description
+
+    print ast.dependencies
 
     print ast.packages
 

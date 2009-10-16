@@ -87,10 +87,17 @@ description_definition = \
 version = Literal('Version')
 version_definition = version + colon + version_string.setResultsName('version')
 
+depends = Literal('Depends')
+depends_value = Group(OneOrMore(empty + indented_string))
+depends_definition = depends + colon + \
+        INDENT + \
+        depends_value.setResultsName('dependencies') + \
+        UNDENT
+
 metadata_field = (description_definition | name_definition | summary_definition \
         | author_definition | author_email_definition \
         | maintainer_email_definition | maintainer_definition \
-        | version_definition)
+        | version_definition | depends_definition)
 
 # Modules section
 modules = Literal("Modules")
